@@ -1,0 +1,52 @@
+using CsvHelper;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Exam_preparation
+{
+    class Program
+    {
+        public static object Response { get; private set; }
+
+        static void Main(string[] args)
+        {
+          // this code only shows how to read data and write it , which avoids the physical file to be read and which helps to write the unit test 
+            //Read data using the 
+            string testString = @"yash,fale,vapi"; //
+            UTF8Encoding encoding = new UTF8Encoding();
+            UnicodeEncoding uniEncoding = new UnicodeEncoding();
+            byte[] testArray = encoding.GetBytes(testString);
+            MemoryStream ms = new MemoryStream(testArray);
+            StreamReader sr = new StreamReader(ms);
+
+            /* this is alternative to read the above things
+            Stream reader will read test.csv file in current folder
+            StreamReader sr = new StreamReader(@"C:\Users\NTSTEST.CSV");
+            */
+
+            //Csv reader reads the stream
+            CsvReader csvread = new CsvReader(sr);
+            csvread.Configuration.HasHeaderRecord = false;
+
+            //csvread will fetch all record in one go to the IEnumerable object record
+            IEnumerable<TestRecord> record = csvread.GetRecords<TestRecord>();
+
+            foreach (var rec in record) // Each record will be fetched and printed on the screen
+            {
+                Console.WriteLine(string.Format("Name : {0}, Sex : {1}, Occupation : {2} <br/>", rec.FirstName, rec.LastName, rec.Address));
+            }
+            sr.Close();
+        }
+    }
+
+    internal class TestRecord
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Address { get; set; }
+    }
+}
